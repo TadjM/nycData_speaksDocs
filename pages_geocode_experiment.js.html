@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/geocode_experiment.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/geocode_experiment.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react'
+import { Map, TileLayer } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+
+import Layout from '../components/layout'
+
+
+
+const GeocodeExperimentPage = () => (
+  &lt;Layout>
+    Geocode Experiment
+    &lt;Geocode />
+    &lt;LeafletMap />
+  &lt;/Layout>
+)
+
+
+/**
+ * React component to render the longitude and lattitude of an address
+ * @extends Component
+ * @returns {number} lat - Lattitude
+ * @returns {number} lng - Longitude
+ */
+class Geocode extends React.Component {
+   /**
+   * Constructor 
+   * @param {object} props - React protoTypes
+   */
+  constructor (props) {
+    super(props)
+    this.state = {
+      error: null,
+      isLoaded: false,
+      location: [],
+      address: '',
+    }
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+  }
+  state = {
+    lat: 51.505,
+    lng: -0.09,
+    zoom: 13,
+  }
+  
+   /**
+   * Geocode a given address using the googgle api
+   * @param {string} address- The address given by the user
+   */
+  geocodeAddress (address) {
+    fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&amp;key=${
+        process.env.GATSBY_GMAPS_API_KEY
+      }`
+    )
+      .then(res => res.json())
+      .then(
+        result => {
+          this.setState({
+            isLoaded: true,
+            location: result.results[0].geometry.location,
+            address,
+          })
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        error => {
+          this.setState({
+            isLoaded: true,
+            error,
+          })
+        }
+      )
+  }
+
+   /**
+   * Event handler - handle the change in the user's input
+   * @param {object} event - Event to be handled
+   */
+
+  handleChange (event) {
+    this.setState({ address: event.target.value })
+  }
+  
+   /**
+   * Event handler - handle the form submission and send the input to the geocodeaddress function
+   * @param {object} event - Event to be handled
+   */
+  handleSubmit (event) {
+    event.preventDefault()
+    this.geocodeAddress(this.state.address)
+  }
+
+  render () {
+    const { location } = this.state
+    return (
+      &lt;div>
+        &lt;p>Enter address:&lt;/p>
+        &lt;form onSubmit={this.handleSubmit}>
+          &lt;input type='text' name='address' onChange={this.handleChange} />
+          &lt;button type='submit'>Submit&lt;/button>
+        &lt;/form>
+        &lt;span>
+          location:{' '}
+          {location ? `lat : ${location.lat} lng : ${location.lng}` : ''}
+        &lt;/span>
+      &lt;/div>
+    )
+  }
+}
+
+
+/**
+ * React component to render a map with leaflet
+ * @extends Component
+ * @returns {Map} - Map of the united states
+ */
+class LeafletMap extends React.Component {
+  state = {
+    lat: 51.505,
+    lng: -0.09,
+    zoom: 13,
+  }
+
+  render () {
+    if (typeof window !== 'undefined') {
+      const position = [this.state.lat, this.state.lng]
+      return (
+        &lt;Map
+          style={{ height: '800px', width: '800px' }}
+          center={position}
+          zoom={this.state.zoom}
+        >
+          &lt;TileLayer
+            attribution='&amp;amp;copy &lt;a href="http://osm.org/copyright">OpenStreetMap&lt;/a> contributors'
+            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          />
+        &lt;/Map>
+      )
+    } else {
+      return null
+    }
+  }
+}
+
+export default GeocodeExperimentPage
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CulturalInstitution.html">CulturalInstitution</a></li><li><a href="Geocode.html">Geocode</a></li><li><a href="IndexPage.html">IndexPage</a></li><li><a href="LeafletMap.html">LeafletMap</a></li><li><a href="Login.html">Login</a></li><li><a href="PrivateRoute.html">PrivateRoute</a></li><li><a href="SignUp.html">SignUp</a></li></ul><h3>Global</h3><ul><li><a href="global.html#confirmSignUp">confirmSignUp</a></li><li><a href="global.html#Error">Error</a></li><li><a href="global.html#handleUpdate">handleUpdate</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#setActiveDataset">setActiveDataset</a></li><li><a href="global.html#setActiveTab">setActiveTab</a></li><li><a href="global.html#SidePane">SidePane</a></li><li><a href="global.html#signUp">signUp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Mon May 20 2019 21:41:06 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
